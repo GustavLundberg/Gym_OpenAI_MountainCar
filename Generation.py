@@ -1,12 +1,13 @@
 from numpy.random import choice
+from statistics import mean
 from NeuralNetwork import *
 
 class Generation:
 
-	def __init__(self, num_individuals, dimensions, activation_hidden, activation_output = 'sigmoid'):
+	def __init__(self, num_individuals, dimensions, num_inputs, activation_hidden, activation_output = 'sigmoid'):
 		self.num_individuals = num_individuals
 		self.dimensions = dimensions
-		self.population = [NeuralNetwork(dimensions = dimensions, activation_hidden = activation_hidden, 
+		self.population = [NeuralNetwork(dimensions = dimensions, num_inputs = num_inputs, activation_hidden = activation_hidden, 
 			activation_output = activation_output) for _ in range(num_individuals)]
 
 	def __repr__(self):
@@ -46,7 +47,7 @@ class Generation:
 			probs = [f/max_fitness for f in fitness] # Normalizing so that all probs is in range [0, 1]
 		
 		### Introduce transforms to the weighted probabilities here ###
-
+		probs = [p if p > mean(probs) else 0 for p in probs]
 		###############################################################
 
 		# Normalizing so all probabilites in probs sum to 1

@@ -11,18 +11,33 @@ env = gym.make('MountainCar-v0')
 #model = NeuralNetwork(dimensions = [5, 3, 1], activation_hidden = 'relu')
 #print('weights : ', model.getModel().get_weights())
 
-### Set parameters ###
-num_episodes = 1
-num_individuals = 20
-dimensions = [2, 1]
-activation_hidden = 'relu'
-activation_output = 'sigmoid'
-num_timesteps = 400
-num_generations = 5
-######################
+### Environment 'settings' ###
+num_actions = 3
+num_inputs = 2
+############################## 
 
-gen = Generation(num_individuals = num_individuals, dimensions = dimensions, activation_hidden = activation_hidden, activation_output = activation_output)
-#print(gen)
+##########################################
+############# Set parameters #############
+##########################################
+
+num_episodes = 1
+num_individuals = 30
+dimensions = [2, 3]
+activation_hidden = 'relu'
+activation_output = 'softmax'
+num_timesteps = 120
+num_generations = 10
+
+pos_weight = 1
+speed_weight = 10
+
+##########################################
+##########################################
+##########################################
+
+gen = Generation(num_individuals = num_individuals, dimensions = dimensions, 
+	num_inputs = num_inputs, activation_hidden = activation_hidden, activation_output = activation_output)
+print(gen)
 
 avg_fitness_history = []
 
@@ -35,24 +50,35 @@ for gen_num in range(num_generations):
 		observation = env.reset()
 
 		fitness = 0
+		best_position = -2 # Best position during the entire episode
+		max_speed = 0 # Note that this is the magnitude if the velocity, i.e. direction does not matter
 		# Loop over the number of time steps
 		for t in range(num_timesteps):
 			env.render()
-			observation = np.reshape(observation, [1, 4])
+			observation = np.reshape(observation, [1, num_inputs])
 			#print('Observation : ', type(observation), observation, observation.shape)
-			action = individual.predict(observation)
+			
+			# For multiclass classification, choose predict_multiclass
+			# For binary classification, choose predict_binary
+			action = individual.predict_multiclass(observation)
+			
 			#print('action = ', action)
 			observation, reward, done, info = env.step(action)
 			#print('-----------------------------')
-			
+			if observation[0] > best_position:
+				best_position = observation[0]
+
+			if abs(observation[1]) > max_speed:
+				max_speed = observation[1]
+
+			# fitness += reward
 			#time.sleep(0.1)
 			if done:
 				break
 
-			fitness += 1
-
-		print('Episode finished after {} timesteps'.format(fitness+1))
-		individual.set_fitness(fitness+1)
+		fitness = pos_weight * best_position + speed_weight * max_speed # Using best_position and max_speed as fitness instead of using the reward of the environment
+		print('Fitness for this episode = {}'.format(fitness))
+		individual.set_fitness(fitness)
 
 	avg_fitness_history.append(mean(gen.get_fitness()))
 
