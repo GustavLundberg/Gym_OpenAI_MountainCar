@@ -73,8 +73,6 @@ class NeuralNetwork:
 		#print('NEW WEIGHTS = ', NeuralNetwork_new.getModel().get_weights())
 		return NeuralNetwork_new
 
-
-	# Det kanske ær bættre att bara sætta upp en regel: sampla ett integer och sen låta det motsvara en plats i den totala vikt-listan. Genom att anvænda lite modulo och sånt! Typ som nær man ska væxla pengar. Det kommer ju såklart att bero på dimensions, dvs hur många noder och dærmed vikter det finns i lagrena.
 	def flatten(self):
 		
 		flattened = np.array([])
@@ -101,7 +99,7 @@ class NeuralNetwork:
 		start_pos = end_pos
 		end_pos = start_pos + self.dimensions[0]
 
-		weights.append(flattened[start_pos: (self.num_inputs*self.dimensions[0] + self.dimensions[0])])
+		weights.append(flattened[start_pos:end_pos])
 
 
 		# Second layer
@@ -112,18 +110,18 @@ class NeuralNetwork:
 		weights.append(np.reshape(flattened[start_pos:end_pos], newshape = new_shape))
 
 		start_pos = end_pos
-		end_pos += self.dimensions[0]
+		end_pos = start_pos + self.dimensions[1]
 
-		weights.append(flattened[start_pos: (self.num_inputs*self.dimensions[0] + self.dimensions[0])])		
+		weights.append(flattened[start_pos:end_pos])		
 
 
 
 
 
 		# Second layer
-		start_pos += 
-		weights.append(np.reshape(flattened[(self.num_inputs*self.dimensions[0] + self.dimensions[0]) : (self.num_inputs*self.dimensions[0] + self.dimensions[0])], 
-			newshape = (self.num_inputs, self.dimensions[0])))
+		#start_pos += 
+		#weights.append(np.reshape(flattened[(self.num_inputs*self.dimensions[0] + self.dimensions[0]) : (self.num_inputs*self.dimensions[0] + self.dimensions[0])], 
+		#	newshape = (self.num_inputs, self.dimensions[0])))
 
 		print('weights = ', weights)
 
