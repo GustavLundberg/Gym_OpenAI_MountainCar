@@ -19,7 +19,6 @@ class Generation:
 	def get_fitness(self):
 		return [individual.get_fitness() for individual in self.population]
 
-	# HAVE NOT TESTED THIS FUNCTION!
 	def sort_population(self):
 		
 		def fitness_key(neuralNetwork):
@@ -60,14 +59,17 @@ class Generation:
 		rand_ints = choice(list(range(self.num_individuals)), self.num_individuals * 2, p = probs)
 		return [self.population[i] for i in rand_ints]
 
-	def breed_population(self):
+	def breed_population(self, num_mutations = 1, ratio_mean = 0.5):
 		parents = self.select_parents()
 
 		children = []
-		for i in range(0, len(parents), 2):
-			child = parents[i].breed(parents[i+1])
+		children.append(self.population[0]) # Make sure to keep the best individual from prev generation
+		loop_length = len(parents) - 2 		# Use - 2 to compensate for the fact that we are keeping the best individual from prev generation 
+		for i in range(0, loop_length, 2):
+			child = parents[i].breed(parents[i+1], ratio_mean = ratio_mean)
+			child.mutate(num_mutations = num_mutations)
 			children.append(child)
-		
+
 		# Make sure these requirements are fulfilled
 		assert self.dimensions == child.get_dimensions()
 		assert self.num_individuals == len(children)
